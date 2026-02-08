@@ -1,11 +1,11 @@
 {
-  "name": "grok-imagine-openclaw",
+  "name": "clawra-selfie",
   "version": "1.0.0",
-  "description": "Generate images with Grok Imagine and send via OpenClaw",
-  "main": "scripts/grok-imagine-send.ts",
+  "description": "Edit Clawra's image with Grok Imagine and send selfies via OpenClaw",
+  "main": "scripts/clawra-selfie.ts",
   "scripts": {
-    "generate": "ts-node scripts/grok-imagine-send.ts",
-    "test": "echo \"Run: npm run generate '<prompt>' '<channel>' '[caption]'\""
+    "generate": "ts-node scripts/clawra-selfie.ts",
+    "test": "echo \"Run: npm run generate '<context>' '<channel>' '[mode]' '[caption]'\""
   },
   "keywords": [
     "grok",

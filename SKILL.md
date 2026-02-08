@@ -1,10 +1,10 @@
 ---
-name: grok-imagine-openclaw
-description: Edit a reference image with Grok Imagine (xAI Aurora) and send it to messaging channels via OpenClaw
+name: clawra-selfie
+description: Edit Clawra's reference image with Grok Imagine (xAI Aurora) and send selfies to messaging channels via OpenClaw
 allowed-tools: Bash(npm:*) Bash(npx:*) Bash(openclaw:*) Bash(curl:*) Read Write WebFetch
 ---
 
-# Grok Imagine Edit to OpenClaw
+# Clawra Selfie
 
 Edit a fixed reference image using xAI's Grok Imagine model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
 
@@ -18,10 +18,11 @@ https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openc
 
 ## When to Use
 
-- User wants to edit the reference image and share it across messaging channels
-- User says "edit the image and send to..." or "transform the image for..."
-- User mentions Grok Imagine + any messaging platform
-- User wants AI-edited content distributed to team/community channels
+- User says "send a pic", "send me a pic", "send a photo", "send a selfie"
+- User says "send a pic of you...", "send a selfie of you..."
+- User asks "what are you doing?", "how are you doing?", "where are you?"
+- User describes a context: "send a pic wearing...", "send a pic at..."
+- User wants Clawra to appear in a specific outfit, location, or situation
 
 ## Quick Reference
 
