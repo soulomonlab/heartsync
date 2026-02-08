@@ -1,19 +1,27 @@
 ---
 name: grok-imagine-openclaw
-description: Generate images with Grok Imagine (xAI Aurora) and send them to messaging channels via OpenClaw
+description: Edit a reference image with Grok Imagine (xAI Aurora) and send it to messaging channels via OpenClaw
 allowed-tools: Bash(npm:*) Bash(npx:*) Bash(openclaw:*) Bash(curl:*) Read Write WebFetch
 ---
 
-# Grok Imagine to OpenClaw
+# Grok Imagine Edit to OpenClaw
 
-Generate AI images using xAI's Grok Imagine model and distribute them across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
+Edit a fixed reference image using xAI's Grok Imagine model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
+
+## Reference Image
+
+The skill uses a fixed reference image hosted on jsDelivr CDN:
+
+```
+https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png
+```
 
 ## When to Use
 
-- User wants to generate an image and share it across messaging channels
-- User says "generate image and send to..." or "create art for..."
+- User wants to edit the reference image and share it across messaging channels
+- User says "edit the image and send to..." or "transform the image for..."
 - User mentions Grok Imagine + any messaging platform
-- User wants AI-generated content distributed to team/community channels
+- User wants AI-edited content distributed to team/community channels
 
 ## Quick Reference
 
@@ -26,8 +34,8 @@ OPENCLAW_GATEWAY_TOKEN=your_token  # From: openclaw doctor --generate-gateway-to
 
 ### Workflow
 
-1. **Get user prompt** for image generation
-2. **Generate image** via fal.ai Grok Imagine API
+1. **Get user prompt** for how to edit the image
+2. **Edit image** via fal.ai Grok Imagine Edit API with fixed reference
 3. **Extract image URL** from response
 4. **Send to OpenClaw** with target channel(s)
 
@@ -36,22 +44,66 @@ OPENCLAW_GATEWAY_TOKEN=your_token  # From: openclaw doctor --generate-gateway-to
 ### Step 1: Collect User Input
 
 Ask the user for:
-- **Image prompt**: What image should be generated?
+- **User context**: What should the person in the image be doing/wearing/where?
+- **Mode** (optional): `mirror` or `direct` selfie style
 - **Target channel(s)**: Where should it be sent? (e.g., `#general`, `@username`, channel ID)
 - **Platform** (optional): Which platform? (discord, telegram, whatsapp, slack)
 
-### Step 2: Generate Image with Grok Imagine
+## Prompt Modes
 
-Use the fal.ai API to generate the image:
+### Mode 1: Mirror Selfie (default)
+Best for: outfit showcases, full-body shots, fashion content
+
+```
+make a pic of this person, but [user's context]. the person is taking a mirror selfie
+```
+
+**Example**: "wearing a santa hat" →
+```
+make a pic of this person, but wearing a santa hat. the person is taking a mirror selfie
+```
+
+### Mode 2: Direct Selfie
+Best for: close-up portraits, location shots, emotional expressions
+
+```
+a close-up selfie taken by herself at [user's context], direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible
+```
+
+**Example**: "a cozy cafe with warm lighting" →
+```
+a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible
+```
+
+### Mode Selection Logic
+
+| Keywords in Request | Auto-Select Mode |
+|---------------------|------------------|
+| outfit, wearing, clothes, dress, suit, fashion | `mirror` |
+| cafe, restaurant, beach, park, city, location | `direct` |
+| close-up, portrait, face, eyes, smile | `direct` |
+| full-body, mirror, reflection | `mirror` |
+
+### Step 2: Edit Image with Grok Imagine
+
+Use the fal.ai API to edit the reference image:
 
 ```bash
-curl -X POST "https://fal.run/xai/grok-imagine-image" \
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png"
+
+# Mode 1: Mirror Selfie
+PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie"
+
+# Mode 2: Direct Selfie
+PROMPT="a close-up selfie taken by herself at <USER_CONTEXT>, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
+
+curl -X POST "https://fal.run/xai/grok-imagine-image/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "<USER_PROMPT>",
+    "image_url": "'"$REFERENCE_IMAGE"'",
+    "prompt": "'"$PROMPT"'",
     "num_images": 1,
-    "aspect_ratio": "1:1",
     "output_format": "jpeg"
   }'
 ```
@@ -73,7 +125,7 @@ curl -X POST "https://fal.run/xai/grok-imagine-image" \
 
 ### Step 3: Send Image via OpenClaw
 
-Use the OpenClaw messaging API to send the generated image:
+Use the OpenClaw messaging API to send the edited image:
 
 ```bash
 openclaw message send \
@@ -100,7 +152,7 @@ curl -X POST "http://localhost:18789/message" \
 
 ```bash
 #!/bin/bash
-# grok-imagine-send.sh
+# grok-imagine-edit-send.sh
 
 # Check required environment variables
 if [ -z "$FAL_KEY" ]; then
@@ -108,25 +160,52 @@ if [ -z "$FAL_KEY" ]; then
   exit 1
 fi
 
-PROMPT="$1"
-CHANNEL="$2"
-CAPTION="${3:-Generated with Grok Imagine}"
+# Fixed reference image
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png"
 
-if [ -z "$PROMPT" ] || [ -z "$CHANNEL" ]; then
-  echo "Usage: $0 <prompt> <channel> [caption]"
+USER_CONTEXT="$1"
+CHANNEL="$2"
+MODE="${3:-auto}"  # mirror, direct, or auto
+CAPTION="${4:-Edited with Grok Imagine}"
+
+if [ -z "$USER_CONTEXT" ] || [ -z "$CHANNEL" ]; then
+  echo "Usage: $0 <user_context> <channel> [mode] [caption]"
+  echo "Modes: mirror, direct, auto (default)"
+  echo "Example: $0 'wearing a cowboy hat' '#general' mirror"
+  echo "Example: $0 'a cozy cafe' '#general' direct"
   exit 1
 fi
 
-echo "Generating image with prompt: $PROMPT"
+# Auto-detect mode based on keywords
+if [ "$MODE" == "auto" ]; then
+  if echo "$USER_CONTEXT" | grep -qiE "outfit|wearing|clothes|dress|suit|fashion|full-body|mirror"; then
+    MODE="mirror"
+  elif echo "$USER_CONTEXT" | grep -qiE "cafe|restaurant|beach|park|city|close-up|portrait|face|eyes|smile"; then
+    MODE="direct"
+  else
+    MODE="mirror"  # default
+  fi
+  echo "Auto-detected mode: $MODE"
+fi
 
-# Generate image
-RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image" \
+# Construct the prompt based on mode
+if [ "$MODE" == "direct" ]; then
+  EDIT_PROMPT="a close-up selfie taken by herself at $USER_CONTEXT, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
+else
+  EDIT_PROMPT="make a pic of this person, but $USER_CONTEXT. the person is taking a mirror selfie"
+fi
+
+echo "Mode: $MODE"
+echo "Editing reference image with prompt: $EDIT_PROMPT"
+
+# Edit image
+RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "{
-    \"prompt\": \"$PROMPT\",
+    \"image_url\": \"$REFERENCE_IMAGE\",
+    \"prompt\": \"$EDIT_PROMPT\",
     \"num_images\": 1,
-    \"aspect_ratio\": \"1:1\",
     \"output_format\": \"jpeg\"
   }")
 
@@ -134,12 +213,12 @@ RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image" \
 IMAGE_URL=$(echo "$RESPONSE" | jq -r '.images[0].url')
 
 if [ "$IMAGE_URL" == "null" ] || [ -z "$IMAGE_URL" ]; then
-  echo "Error: Failed to generate image"
+  echo "Error: Failed to edit image"
   echo "Response: $RESPONSE"
   exit 1
 fi
 
-echo "Image generated: $IMAGE_URL"
+echo "Image edited: $IMAGE_URL"
 echo "Sending to channel: $CHANNEL"
 
 # Send via OpenClaw
@@ -161,6 +240,8 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png";
+
 interface GrokImagineResult {
   images: Array<{
     url: string;
@@ -171,9 +252,28 @@ interface GrokImagineResult {
   revised_prompt?: string;
 }
 
-async function generateAndSend(
-  prompt: string,
+type SelfieMode = "mirror" | "direct" | "auto";
+
+function detectMode(userContext: string): "mirror" | "direct" {
+  const mirrorKeywords = /outfit|wearing|clothes|dress|suit|fashion|full-body|mirror/i;
+  const directKeywords = /cafe|restaurant|beach|park|city|close-up|portrait|face|eyes|smile/i;
+
+  if (directKeywords.test(userContext)) return "direct";
+  if (mirrorKeywords.test(userContext)) return "mirror";
+  return "mirror"; // default
+}
+
+function buildPrompt(userContext: string, mode: "mirror" | "direct"): string {
+  if (mode === "direct") {
+    return `a close-up selfie taken by herself at ${userContext}, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible`;
+  }
+  return `make a pic of this person, but ${userContext}. the person is taking a mirror selfie`;
+}
+
+async function editAndSend(
+  userContext: string,
   channel: string,
+  mode: SelfieMode = "auto",
   caption?: string
 ): Promise<string> {
   // Configure fal.ai client
@@ -181,23 +281,30 @@ async function generateAndSend(
     credentials: process.env.FAL_KEY!
   });
 
-  // Generate image with Grok Imagine
-  console.log(`Generating image: "${prompt}"`);
+  // Determine mode
+  const actualMode = mode === "auto" ? detectMode(userContext) : mode;
+  console.log(`Mode: ${actualMode}`);
 
-  const result = await fal.subscribe("xai/grok-imagine-image", {
+  // Construct the prompt
+  const editPrompt = buildPrompt(userContext, actualMode);
+
+  // Edit reference image with Grok Imagine
+  console.log(`Editing image: "${editPrompt}"`);
+
+  const result = await fal.subscribe("xai/grok-imagine-image/edit", {
     input: {
-      prompt,
+      image_url: REFERENCE_IMAGE,
+      prompt: editPrompt,
       num_images: 1,
-      aspect_ratio: "1:1",
       output_format: "jpeg"
     }
   }) as { data: GrokImagineResult };
 
   const imageUrl = result.data.images[0].url;
-  console.log(`Image URL: ${imageUrl}`);
+  console.log(`Edited image URL: ${imageUrl}`);
 
   // Send via OpenClaw
-  const messageCaption = caption || `Generated with Grok Imagine`;
+  const messageCaption = caption || `Edited with Grok Imagine`;
 
   await execAsync(
     `openclaw message send --action send --channel "${channel}" --message "${messageCaption}" --media "${imageUrl}"`
@@ -207,12 +314,29 @@ async function generateAndSend(
   return imageUrl;
 }
 
-// Usage
-generateAndSend(
-  "A cyberpunk city at sunset with neon lights",
+// Usage Examples
+
+// Mirror mode (auto-detected from "wearing")
+editAndSend(
+  "wearing a cyberpunk outfit with neon lights",
   "#art-gallery",
-  "Check out this AI-generated art!"
+  "auto",
+  "Check out this AI-edited art!"
 );
+// → Mode: mirror
+// → Prompt: "make a pic of this person, but wearing a cyberpunk outfit with neon lights. the person is taking a mirror selfie"
+
+// Direct mode (auto-detected from "cafe")
+editAndSend(
+  "a cozy cafe with warm lighting",
+  "#photography",
+  "auto"
+);
+// → Mode: direct
+// → Prompt: "a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye contact..."
+
+// Explicit mode override
+editAndSend("casual street style", "#fashion", "direct");
 ```
 
 ## Supported Platforms
@@ -228,13 +352,13 @@ OpenClaw supports sending to:
 | Signal | Phone number | `+1234567890` |
 | MS Teams | Channel reference | (varies) |
 
-## Grok Imagine Parameters
+## Grok Imagine Edit Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `prompt` | string | required | Image description |
+| `image_url` | string | required | URL of image to edit (fixed in this skill) |
+| `prompt` | string | required | Edit instruction |
 | `num_images` | 1-4 | 1 | Number of images to generate |
-| `aspect_ratio` | enum | "1:1" | 2:1, 16:9, 4:3, 1:1, 3:4, 9:16, etc. |
 | `output_format` | enum | "jpeg" | jpeg, png, webp |
 
 ## Setup Requirements
@@ -263,13 +387,24 @@ openclaw gateway start
 ## Error Handling
 
 - **FAL_KEY missing**: Ensure the API key is set in environment
-- **Image generation failed**: Check prompt content and API quota
+- **Image edit failed**: Check prompt content and API quota
 - **OpenClaw send failed**: Verify gateway is running and channel exists
 - **Rate limits**: fal.ai has rate limits; implement retry logic if needed
 
 ## Tips
 
-1. **Better prompts**: Be descriptive - include style, lighting, mood
-2. **Aspect ratios**: Use 16:9 for landscape, 9:16 for stories/reels
-3. **Batch sending**: Generate once, send to multiple channels
-4. **Scheduling**: Combine with OpenClaw scheduler for automated posts
+1. **Mirror mode context examples** (outfit focus):
+   - "wearing a santa hat"
+   - "in a business suit"
+   - "wearing a summer dress"
+   - "in streetwear fashion"
+
+2. **Direct mode context examples** (location/portrait focus):
+   - "a cozy cafe with warm lighting"
+   - "a sunny beach at sunset"
+   - "a busy city street at night"
+   - "a peaceful park in autumn"
+
+3. **Mode selection**: Let auto-detect work, or explicitly specify for control
+4. **Batch sending**: Edit once, send to multiple channels
+5. **Scheduling**: Combine with OpenClaw scheduler for automated posts
