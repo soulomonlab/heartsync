@@ -13,7 +13,7 @@ Edit a fixed reference image using xAI's Grok Imagine model and distribute it ac
 The skill uses a fixed reference image hosted on jsDelivr CDN:
 
 ```
-https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png
+https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png
 ```
 
 ## When to Use
@@ -90,7 +90,7 @@ a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye
 Use the fal.ai API to edit the reference image:
 
 ```bash
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
 
 # Mode 1: Mirror Selfie
 PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie"
@@ -98,15 +98,16 @@ PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mi
 # Mode 2: Direct Selfie
 PROMPT="a close-up selfie taken by herself at <USER_CONTEXT>, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
 
+# Build JSON payload with jq (handles escaping properly)
+JSON_PAYLOAD=$(jq -n \
+  --arg image_url "$REFERENCE_IMAGE" \
+  --arg prompt "$PROMPT" \
+  '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
+
 curl -X POST "https://fal.run/xai/grok-imagine-image/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "image_url": "'"$REFERENCE_IMAGE"'",
-    "prompt": "'"$PROMPT"'",
-    "num_images": 1,
-    "output_format": "jpeg"
-  }'
+  -d "$JSON_PAYLOAD"
 ```
 
 **Response Format:**
@@ -162,7 +163,7 @@ if [ -z "$FAL_KEY" ]; then
 fi
 
 # Fixed reference image
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
 
 USER_CONTEXT="$1"
 CHANNEL="$2"
@@ -199,16 +200,16 @@ fi
 echo "Mode: $MODE"
 echo "Editing reference image with prompt: $EDIT_PROMPT"
 
-# Edit image
+# Edit image (using jq for proper JSON escaping)
+JSON_PAYLOAD=$(jq -n \
+  --arg image_url "$REFERENCE_IMAGE" \
+  --arg prompt "$EDIT_PROMPT" \
+  '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
+
 RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
-  -d "{
-    \"image_url\": \"$REFERENCE_IMAGE\",
-    \"prompt\": \"$EDIT_PROMPT\",
-    \"num_images\": 1,
-    \"output_format\": \"jpeg\"
-  }")
+  -d "$JSON_PAYLOAD")
 
 # Extract image URL
 IMAGE_URL=$(echo "$RESPONSE" | jq -r '.images[0].url')
@@ -241,7 +242,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/David-Dohyun-Im/mdswd@main/skills/grok-imagine-openclaw/assets/clawra.png";
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png";
 
 interface GrokImagineResult {
   images: Array<{
