@@ -297,6 +297,7 @@ async function updateOpenClawConfig(falKey) {
       entries: {
         [SKILL_NAME]: {
           enabled: true,
+          apiKey: falKey,
           env: {
             FAL_KEY: falKey,
           },
