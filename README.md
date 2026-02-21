@@ -80,7 +80,7 @@ The installer will:
 ### 1) Clone
 
 ```bash
-git clone https://github.com/mcj9587/heartsync ~/.openclaw/skills/heartsync-selfie
+git clone https://github.com/soulomonlab/heartsync ~/.openclaw/skills/heartsync-selfie
 ```
 
 ### 2) Configure OpenClaw
@@ -131,7 +131,7 @@ Your agent can respond to:
 Default reference image URL:
 
 ```text
-https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/heartsync.png
+https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png
 ```
 
 You can replace this with your own image in scripts/config for custom visual identity.
@@ -162,7 +162,7 @@ heartsync/
 │   ├── heartsync-selfie.sh
 │   └── heartsync-selfie.ts
 ├── assets/
-│   └── heartsync.png
+│   └── boy.png
 ├── SKILL.md
 ├── package.json
 └── README.md
