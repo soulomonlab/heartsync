@@ -1,10 +1,10 @@
 ---
-name: clawra-selfie
-description: Edit Clawra's reference image with Grok Imagine (xAI Aurora) and send selfies to messaging channels via OpenClaw
+name: boyfriend-selfie
+description: Edit Boyfriend's reference image with Grok Imagine (xAI Aurora) and send selfies to messaging channels via OpenClaw
 allowed-tools: Bash(npm:*) Bash(npx:*) Bash(openclaw:*) Bash(curl:*) Read Write WebFetch
 ---
 
-# Clawra Selfie
+# Boyfriend Selfie
 
 Edit a fixed reference image using xAI's Grok Imagine model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
 
@@ -13,7 +13,7 @@ Edit a fixed reference image using xAI's Grok Imagine model and distribute it ac
 The skill uses a fixed reference image hosted on jsDelivr CDN:
 
 ```
-https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png
+https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png
 ```
 
 ## When to Use
@@ -22,7 +22,7 @@ https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png
 - User says "send a pic of you...", "send a selfie of you..."
 - User asks "what are you doing?", "how are you doing?", "where are you?"
 - User describes a context: "send a pic wearing...", "send a pic at..."
-- User wants Clawra to appear in a specific outfit, location, or situation
+- User wants Boyfriend to appear in a specific outfit, location, or situation
 
 ## Quick Reference
 
@@ -68,12 +68,12 @@ make a pic of this person, but wearing a santa hat. the person is taking a mirro
 Best for: close-up portraits, location shots, emotional expressions
 
 ```
-a close-up selfie taken by herself at [user's context], direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible
+a close-up selfie taken by himself at [user's context], direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible
 ```
 
 **Example**: "a cozy cafe with warm lighting" →
 ```
-a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible
+a close-up selfie taken by himself at a cozy cafe with warm lighting, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible
 ```
 
 ### Mode Selection Logic
@@ -90,13 +90,13 @@ a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye
 Use the fal.ai API to edit the reference image:
 
 ```bash
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png"
 
 # Mode 1: Mirror Selfie
 PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie"
 
 # Mode 2: Direct Selfie
-PROMPT="a close-up selfie taken by herself at <USER_CONTEXT>, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
+PROMPT="a close-up selfie taken by himself at <USER_CONTEXT>, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
 
 # Build JSON payload with jq (handles escaping properly)
 JSON_PAYLOAD=$(jq -n \
@@ -163,7 +163,7 @@ if [ -z "$FAL_KEY" ]; then
 fi
 
 # Fixed reference image
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png"
 
 USER_CONTEXT="$1"
 CHANNEL="$2"
@@ -192,7 +192,7 @@ fi
 
 # Construct the prompt based on mode
 if [ "$MODE" == "direct" ]; then
-  EDIT_PROMPT="a close-up selfie taken by herself at $USER_CONTEXT, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
+  EDIT_PROMPT="a close-up selfie taken by himself at $USER_CONTEXT, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
 else
   EDIT_PROMPT="make a pic of this person, but $USER_CONTEXT. the person is taking a mirror selfie"
 fi
@@ -242,7 +242,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png";
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png";
 
 interface GrokImagineResult {
   images: Array<{
@@ -267,7 +267,7 @@ function detectMode(userContext: string): "mirror" | "direct" {
 
 function buildPrompt(userContext: string, mode: "mirror" | "direct"): string {
   if (mode === "direct") {
-    return `a close-up selfie taken by herself at ${userContext}, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible`;
+    return `a close-up selfie taken by himself at ${userContext}, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible`;
   }
   return `make a pic of this person, but ${userContext}. the person is taking a mirror selfie`;
 }
@@ -335,7 +335,7 @@ editAndSend(
   "auto"
 );
 // → Mode: direct
-// → Prompt: "a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye contact..."
+// → Prompt: "a close-up selfie taken by himself at a cozy cafe with warm lighting, direct eye contact..."
 
 // Explicit mode override
 editAndSend("casual street style", "#fashion", "direct");
