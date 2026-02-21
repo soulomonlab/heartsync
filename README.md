@@ -114,25 +114,6 @@ Use the `heartsync-selfie` skill for photo requests.
 
 ---
 
-## Multi-Reference Profiles
-
-HeartSync now supports multiple reference profiles.
-
-Set optional env vars:
-
-```bash
-HEARTSYNC_REF_MAIN=https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-main.png
-HEARTSYNC_REF_CASUAL=https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-casual.png
-HEARTSYNC_REF_FORMAL=https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-formal.png
-HEARTSYNC_REF_OUTDOOR=https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-outdoor.png
-```
-
-Script usage supports profile as the 6th argument:
-
-```bash
-./scripts/heartsync-selfie.sh "send a nice pic" "@username" "for you" "1:1" "jpeg" "formal"
-```
-
 ## Usage Examples
 
 Your agent can respond to:
@@ -152,7 +133,7 @@ Your agent can respond to:
 Default reference image URL:
 
 ```text
-https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-main.png
+https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png
 ```
 
 You can replace this with your own image in scripts/config for custom visual identity.
@@ -183,11 +164,7 @@ heartsync/
 │   ├── heartsync-selfie.sh
 │   └── heartsync-selfie.ts
 ├── assets/
-│   ├── boy.png
-│   ├── boy-main.png
-│   ├── boy-casual.png
-│   ├── boy-formal.png
-│   └── boy-outdoor.png
+│   └── boy.png
 ├── SKILL.md
 ├── package.json
 └── README.md

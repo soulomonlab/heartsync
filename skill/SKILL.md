@@ -13,10 +13,7 @@ Edit a fixed reference image using xAI's Grok Imagine model and distribute it ac
 The skill uses a fixed reference image hosted on jsDelivr CDN:
 
 ```
-main:    https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-main.png
-casual:  https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-casual.png
-formal:  https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-formal.png
-outdoor: https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-outdoor.png
+main:    https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png
 ```
 
 ## When to Use
@@ -115,7 +112,7 @@ Suggested captions:
 Use the fal.ai API to edit the reference image:
 
 ```bash
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-main.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png"
 
 # Mode 1: Mirror Selfie
 PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie"
@@ -188,7 +185,7 @@ if [ -z "$FAL_KEY" ]; then
 fi
 
 # Fixed reference image
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-main.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png"
 
 USER_CONTEXT="$1"
 CHANNEL="$2"
@@ -267,7 +264,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-main.png";
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png";
 
 interface GrokImagineResult {
   images: Array<{
