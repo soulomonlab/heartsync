@@ -122,7 +122,7 @@ async function generateImage(input: {
 
 async function sendViaOpenClaw(message: OpenClawMessage, useCLI: boolean) {
   if (useCLI) {
-    const cmd = `openclaw message send --action send --channel "${message.channel}" --message "${message.message}" --media "${message.media}"`;
+    const cmd = `openclaw message send --target "${message.channel}" --message "${message.message}" --media "${message.media}"`;
     await execAsync(cmd);
     return;
   }

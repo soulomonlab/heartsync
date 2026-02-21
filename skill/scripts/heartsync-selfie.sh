@@ -94,8 +94,7 @@ if [ -z "$IMAGE_URL" ]; then
 fi
 
 openclaw message send \
-  --action send \
-  --channel "$CHANNEL" \
+  --target "$CHANNEL" \
   --message "$CAPTION" \
   --media "$IMAGE_URL"
 
