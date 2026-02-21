@@ -1,6 +1,13 @@
-# Boyfriend Selfie (OpenClaw Skill)
-<img width="300"  alt="image" src="https://github.com/user-attachments/assets/41512c51-e61d-4550-b461-eed06a1b0ec8" />
+# Boyfriend Selfie for OpenClaw 💖
 
+Turn your OpenClaw agent into a **boyfriend persona** that can send selfies on command.
+
+Inspired by the Clawra workflow, this package installs a plug-and-play OpenClaw skill with:
+- relationship-style persona injection
+- selfie generation flow (fal.ai)
+- boyfriend-specific prompt modes and presets
+
+---
 
 ## Quick Start
 
@@ -8,47 +15,69 @@
 npx boyfriend-selfie@latest
 ```
 
-This will:
-1. Check OpenClaw is installed
-2. Guide you to get a fal.ai API key
-3. Install the skill to `~/.openclaw/skills/boyfriend-selfie/`
-4. Configure OpenClaw to use the skill
-5. Add selfie capabilities to your agent's SOUL.md
+The installer will:
+1. Check OpenClaw installation
+2. Ask for your `FAL_KEY` (fal.ai)
+3. Install skill to `~/.openclaw/skills/boyfriend-selfie/`
+4. Update `~/.openclaw/openclaw.json`
+5. Inject boyfriend selfie capability into your workspace `SOUL.md`
 
-## What It Does
+---
 
-Boyfriend Selfie enables your OpenClaw agent to:
-- **Generate selfies** using a consistent reference image
-- **Send photos** across all messaging platforms (Discord, Telegram, WhatsApp, etc.)
-- **Respond visually** to "what are you doing?" and "send a pic" requests
+## What This Skill Does
 
-### Selfie Modes
+`boyfriend-selfie` enables your agent to:
+- **send selfie photos** when asked
+- keep a **consistent visual identity** (reference image based)
+- respond naturally to relationship-style requests like:
+  - “send me a selfie”
+  - “show me your date-night look”
+  - “good morning selfie”
+  - “what are you doing right now?”
+
+---
+
+## V2 Boyfriend Relationship Pack
+
+### Persona Modes
+- **soft**: emotionally warm, supportive, comforting
+- **chill**: casual, playful daily vibe
+- **flirty**: romantic but respectful and consent-first
+
+### Preset Selfie Intents
+- `good morning selfie`
+- `good night selfie`
+- `date-night look`
+- `work-mode check-in`
+
+---
+
+## Selfie Modes
 
 | Mode | Best For | Keywords |
 |------|----------|----------|
-| **Mirror** | Full-body shots, outfits | wearing, outfit, fashion |
-| **Direct** | Close-ups, locations | cafe, beach, portrait, smile |
+| Mirror | Outfit/full-body | wearing, outfit, fashion, full-body |
+| Direct | Close-up/location | cafe, beach, portrait, close-up, smile |
+
+---
 
 ## Prerequisites
 
-- [OpenClaw](https://github.com/openclaw/openclaw) installed and configured
-- [fal.ai](https://fal.ai) account (free tier available)
+- [OpenClaw](https://github.com/openclaw/openclaw) installed
+- [fal.ai](https://fal.ai) account
+- `FAL_KEY` from https://fal.ai/dashboard/keys
+
+---
 
 ## Manual Installation
 
-If you prefer manual setup:
-
-### 1. Get API Key
-
-Visit [fal.ai/dashboard/keys](https://fal.ai/dashboard/keys) and create an API key.
-
-### 2. Clone the Skill
+### 1) Clone
 
 ```bash
-git clone https://github.com/chaejeong/boyfriend-selfie ~/.openclaw/skills/boyfriend-selfie
+git clone https://github.com/mcj9587/boyfriend-selfie ~/.openclaw/skills/boyfriend-selfie
 ```
 
-### 3. Configure OpenClaw
+### 2) Configure OpenClaw
 
 Add to `~/.openclaw/openclaw.json`:
 
@@ -67,77 +96,83 @@ Add to `~/.openclaw/openclaw.json`:
 }
 ```
 
-### 4. Update SOUL.md
-
-Add the selfie persona to `~/.openclaw/workspace/SOUL.md`:
+### 3) Add SOUL capability
 
 ```markdown
 ## Boyfriend Selfie Capability
-
-You have a physical appearance and can take selfies!
-When users ask for pictures, use the boyfriend-selfie skill.
+You have a visual identity and can send selfies/photos when users ask.
+Use the `boyfriend-selfie` skill for photo requests.
 ```
+
+---
 
 ## Usage Examples
 
-Once installed, your agent responds to:
+Your agent can respond to:
 
-```
+```text
 "Send me a selfie"
-"Send a pic wearing a cowboy hat"
+"Show me your date-night look"
+"Good morning selfie please"
+"Send a pic at a cozy cafe"
 "What are you doing right now?"
-"Show me you at a coffee shop"
 ```
+
+---
 
 ## Reference Image
 
-The skill uses a fixed reference image hosted on CDN:
+Default reference image URL:
 
-```
-https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png
+```text
+https://cdn.jsdelivr.net/gh/mcj9587/boyfriend-selfie@main/assets/boyfriend.png
 ```
 
-This ensures consistent appearance across all generated images.
+You can replace this with your own image in scripts/config for custom visual identity.
+
+---
 
 ## Technical Details
 
-- **Image Generation**: xAI Grok Imagine via fal.ai
-- **Messaging**: OpenClaw Gateway API
-- **Supported Platforms**: Discord, Telegram, WhatsApp, Slack, Signal, MS Teams
+- **Image generation**: fal.ai (`xai/grok-imagine-image/edit` or compatible model)
+- **Distribution**: OpenClaw messaging channels
+- **Platforms**: Telegram, Discord, WhatsApp, Slack, Signal, etc.
 
-## V2 Relationship Pack
-
-This fork adds a boyfriend-focused relationship layer:
-
-- **Persona modes**
-  - `soft`: comforting and emotionally validating
-  - `chill`: casual, low-pressure, playful daily vibe
-  - `flirty`: light romantic energy (respectful, consent-first)
-- **Preset selfie intents**
-  - `good-morning selfie`
-  - `good-night selfie`
-  - `date-night look`
-  - `work-mode check-in`
-
-Use these as keywords in user prompts, e.g.:
-- "send a good morning selfie"
-- "show me your date-night look"
-- "send a chill work-mode pic"
+---
 
 ## Project Structure
 
-```
+```text
 boyfriend-selfie/
 ├── bin/
-│   └── cli.js           # npx installer
+│   └── cli.js
 ├── skill/
-│   ├── SKILL.md         # Skill definition
-│   ├── scripts/         # Generation scripts
-│   └── assets/          # Reference image
+│   ├── SKILL.md
+│   ├── scripts/
+│   └── assets/
 ├── templates/
-│   └── soul-injection.md # Persona template
-└── package.json
+│   └── soul-injection.md
+├── scripts/
+│   ├── boyfriend-selfie.sh
+│   └── boyfriend-selfie.ts
+├── assets/
+│   └── boyfriend.png
+├── SKILL.md
+├── package.json
+└── README.md
 ```
+
+---
+
+## Release Checklist
+
+- [ ] Update version in `package.json`
+- [ ] Confirm README links and repo URL
+- [ ] Test installer: `npx .` or local package
+- [ ] Push to GitHub main branch
+- [ ] Publish npm package (`npm publish`)
+
+---
 
 ## License
 
