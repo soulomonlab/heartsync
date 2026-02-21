@@ -18,7 +18,7 @@ Inspired by the Clawra workflow, this package installs a plug-and-play OpenClaw 
 ## Quick Start
 
 ```bash
-npx heartsync@latest
+npx @cjmaeng/heartsync@latest
 ```
 
 The installer will:
