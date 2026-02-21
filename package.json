@@ -1,5 +1,5 @@
 {
-  "name": "heartsync",
+  "name": "@cjmaeng/heartsync",
   "version": "1.2.0",
   "description": "Add selfie superpowers to your OpenClaw agent using xAI Grok Imagine",
   "bin": {
@@ -35,7 +35,6 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {},
   "devDependencies": {
     "@fal-ai/client": "^1.2.0",
     "@types/node": "^22.0.0",
