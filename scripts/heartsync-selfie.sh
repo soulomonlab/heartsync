@@ -36,7 +36,7 @@ if [ -z "$PROMPT" ] || [ -z "$CHANNEL" ]; then
   exit 1
 fi
 
-REF_MAIN="${HEARTSYNC_REF_MAIN:-${HEARTSYNC_REF_IMAGE:-https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png}}"
+REF_MAIN="${HEARTSYNC_REF_MAIN:-${HEARTSYNC_REF_IMAGE:-https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/main.png}}"
 REF_CASUAL="${HEARTSYNC_REF_CASUAL:-$REF_MAIN}"
 REF_FORMAL="${HEARTSYNC_REF_FORMAL:-$REF_MAIN}"
 REF_OUTDOOR="${HEARTSYNC_REF_OUTDOOR:-$REF_MAIN}"

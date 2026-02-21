@@ -73,7 +73,7 @@ function getReferenceImage(profile: Profile): string {
     byProfile[profile] ||
     process.env.HEARTSYNC_REF_MAIN ||
     process.env.HEARTSYNC_REF_IMAGE ||
-    "https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png"
+    "https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/main.png"
   );
 }
 
