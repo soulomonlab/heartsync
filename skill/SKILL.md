@@ -1,10 +1,10 @@
 ---
-name: boyfriend-selfie
-description: Edit Boyfriend's reference image with Grok Imagine (xAI Aurora) and send selfies to messaging channels via OpenClaw
+name: heartsync-selfie
+description: Edit HeartSync's reference image with Grok Imagine (xAI Aurora) and send selfies to messaging channels via OpenClaw
 allowed-tools: Bash(npm:*) Bash(npx:*) Bash(openclaw:*) Bash(curl:*) Read Write WebFetch
 ---
 
-# Boyfriend Selfie
+# HeartSync Selfie
 
 Edit a fixed reference image using xAI's Grok Imagine model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
 
@@ -13,7 +13,7 @@ Edit a fixed reference image using xAI's Grok Imagine model and distribute it ac
 The skill uses a fixed reference image hosted on jsDelivr CDN:
 
 ```
-https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png
+https://cdn.jsdelivr.net/gh/mcj9587/heartsync@main/assets/heartsync.png
 ```
 
 ## When to Use
@@ -22,7 +22,7 @@ https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png
 - User says "send a pic of you...", "send a selfie of you..."
 - User asks "what are you doing?", "how are you doing?", "where are you?"
 - User describes a context: "send a pic wearing...", "send a pic at..."
-- User wants Boyfriend to appear in a specific outfit, location, or situation
+- User wants HeartSync to appear in a specific outfit, location, or situation
 
 ## Quick Reference
 
@@ -112,7 +112,7 @@ Suggested captions:
 Use the fal.ai API to edit the reference image:
 
 ```bash
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/mcj9587/heartsync@main/assets/heartsync.png"
 
 # Mode 1: Mirror Selfie
 PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie"
@@ -185,7 +185,7 @@ if [ -z "$FAL_KEY" ]; then
 fi
 
 # Fixed reference image
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/mcj9587/heartsync@main/assets/heartsync.png"
 
 USER_CONTEXT="$1"
 CHANNEL="$2"
@@ -264,7 +264,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/chaejeong/boyfriend-selfie@main/assets/boyfriend.png";
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/mcj9587/heartsync@main/assets/heartsync.png";
 
 interface GrokImagineResult {
   images: Array<{

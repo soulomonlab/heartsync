@@ -1,4 +1,4 @@
-# Boyfriend Selfie for OpenClaw 💖
+# HeartSync for OpenClaw 💖
 
 Turn your OpenClaw agent into a **boyfriend persona** that can send selfies on command.
 
@@ -18,13 +18,13 @@ Inspired by the Clawra workflow, this package installs a plug-and-play OpenClaw 
 ## Quick Start
 
 ```bash
-npx boyfriend-selfie@latest
+npx heartsync@latest
 ```
 
 The installer will:
 1. Check OpenClaw installation
 2. Ask for your `FAL_KEY` (fal.ai)
-3. Install skill to `~/.openclaw/skills/boyfriend-selfie/`
+3. Install skill to `~/.openclaw/skills/heartsync/`
 4. Update `~/.openclaw/openclaw.json`
 5. Inject boyfriend selfie capability into your workspace `SOUL.md`
 
@@ -32,7 +32,7 @@ The installer will:
 
 ## What This Skill Does
 
-`boyfriend-selfie` enables your agent to:
+`heartsync-selfie` enables your agent to:
 - **send selfie photos** when asked
 - keep a **consistent visual identity** (reference image based)
 - respond naturally to relationship-style requests like:
@@ -43,7 +43,7 @@ The installer will:
 
 ---
 
-## V2 Boyfriend Relationship Pack
+## V2 HeartSync Relationship Pack
 
 ### Persona Modes
 - **soft**: emotionally warm, supportive, comforting
@@ -80,7 +80,7 @@ The installer will:
 ### 1) Clone
 
 ```bash
-git clone https://github.com/mcj9587/boyfriend-selfie ~/.openclaw/skills/boyfriend-selfie
+git clone https://github.com/mcj9587/heartsync ~/.openclaw/skills/heartsync-selfie
 ```
 
 ### 2) Configure OpenClaw
@@ -91,7 +91,7 @@ Add to `~/.openclaw/openclaw.json`:
 {
   "skills": {
     "entries": {
-      "boyfriend-selfie": {
+      "heartsync-selfie": {
         "enabled": true,
         "env": {
           "FAL_KEY": "your_fal_key_here"
@@ -105,9 +105,9 @@ Add to `~/.openclaw/openclaw.json`:
 ### 3) Add SOUL capability
 
 ```markdown
-## Boyfriend Selfie Capability
+## HeartSync Selfie Capability
 You have a visual identity and can send selfies/photos when users ask.
-Use the `boyfriend-selfie` skill for photo requests.
+Use the `heartsync-selfie` skill for photo requests.
 ```
 
 ---
@@ -131,7 +131,7 @@ Your agent can respond to:
 Default reference image URL:
 
 ```text
-https://cdn.jsdelivr.net/gh/mcj9587/boyfriend-selfie@main/assets/boyfriend.png
+https://cdn.jsdelivr.net/gh/mcj9587/heartsync-selfie@main/assets/heartsync.png
 ```
 
 You can replace this with your own image in scripts/config for custom visual identity.
@@ -149,7 +149,7 @@ You can replace this with your own image in scripts/config for custom visual ide
 ## Project Structure
 
 ```text
-boyfriend-selfie/
+heartsync/
 ├── bin/
 │   └── cli.js
 ├── skill/
@@ -159,10 +159,10 @@ boyfriend-selfie/
 ├── templates/
 │   └── soul-injection.md
 ├── scripts/
-│   ├── boyfriend-selfie.sh
-│   └── boyfriend-selfie.ts
+│   ├── heartsync-selfie.sh
+│   └── heartsync-selfie.ts
 ├── assets/
-│   └── boyfriend.png
+│   └── heartsync.png
 ├── SKILL.md
 ├── package.json
 └── README.md
