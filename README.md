@@ -20,7 +20,7 @@ Inspired by the Clawra workflow, this package installs a plug-and-play OpenClaw 
 ## Quick Start
 
 ```bash
-npx @cjmaeng/heartsync@latest
+npx @soulomonlab/heartsync@latest
 ```
 
 The installer will:

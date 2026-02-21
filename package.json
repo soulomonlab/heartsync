@@ -1,5 +1,5 @@
 {
-  "name": "@cjmaeng/heartsync",
+  "name": "@soulomonlab/heartsync",
   "version": "1.2.0",
   "description": "Add selfie superpowers to your OpenClaw agent using xAI Grok Imagine",
   "bin": {
