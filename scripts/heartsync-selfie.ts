@@ -1,50 +1,17 @@
 /**
- * Grok Imagine to OpenClaw Integration
- *
- * Generates images using xAI's Grok Imagine model via fal.ai
- * and sends them to messaging channels via OpenClaw.
+ * HeartSync image sender
  *
  * Usage:
- *   npx ts-node grok-imagine-send.ts "<prompt>" "<channel>" ["<caption>"]
+ *   npx ts-node heartsync-selfie.ts "<prompt>" "<channel>" ["<caption>"] [aspect_ratio] [output_format] [profile]
  *
- * Environment variables:
- *   FAL_KEY - Your fal.ai API key
- *   OPENCLAW_GATEWAY_URL - OpenClaw gateway URL (default: http://localhost:18789)
- *   OPENCLAW_GATEWAY_TOKEN - Gateway auth token (optional)
+ * Profiles:
+ *   main | casual | formal | outdoor
  */
 
 import { exec } from "child_process";
 import { promisify } from "util";
 
 const execAsync = promisify(exec);
-
-// Types
-interface GrokImagineInput {
-  prompt: string;
-  num_images?: number;
-  aspect_ratio?: AspectRatio;
-  output_format?: OutputFormat;
-}
-
-interface GrokImagineImage {
-  url: string;
-  content_type: string;
-  file_name?: string;
-  width: number;
-  height: number;
-}
-
-interface GrokImagineResponse {
-  images: GrokImagineImage[];
-  revised_prompt?: string;
-}
-
-interface OpenClawMessage {
-  action: "send";
-  channel: string;
-  message: string;
-  media?: string;
-}
 
 type AspectRatio =
   | "2:1"
@@ -62,6 +29,25 @@ type AspectRatio =
   | "1:2";
 
 type OutputFormat = "jpeg" | "png" | "webp";
+type Profile = "main" | "casual" | "formal" | "outdoor";
+
+interface GrokImagineResponse {
+  images: Array<{
+    url: string;
+    content_type: string;
+    file_name?: string;
+    width: number;
+    height: number;
+  }>;
+  revised_prompt?: string;
+}
+
+interface OpenClawMessage {
+  action: "send";
+  channel: string;
+  message: string;
+  media?: string;
+}
 
 interface GenerateAndSendOptions {
   prompt: string;
@@ -69,67 +55,52 @@ interface GenerateAndSendOptions {
   caption?: string;
   aspectRatio?: AspectRatio;
   outputFormat?: OutputFormat;
-  useClaudeCodeCLI?: boolean;
+  profile?: Profile;
+  useOpenClawCLI?: boolean;
 }
 
-interface Result {
-  success: boolean;
-  imageUrl: string;
-  channel: string;
+const DEFAULT_PROFILE: Profile = "main";
+
+function getReferenceImage(profile: Profile): string {
+  const byProfile: Record<Profile, string | undefined> = {
+    main: process.env.HEARTSYNC_REF_MAIN,
+    casual: process.env.HEARTSYNC_REF_CASUAL,
+    formal: process.env.HEARTSYNC_REF_FORMAL,
+    outdoor: process.env.HEARTSYNC_REF_OUTDOOR,
+  };
+
+  return (
+    byProfile[profile] ||
+    process.env.HEARTSYNC_REF_MAIN ||
+    process.env.HEARTSYNC_REF_IMAGE ||
+    "https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png"
+  );
+}
+
+async function generateImage(input: {
   prompt: string;
-  revisedPrompt?: string;
-}
-
-// Check for fal.ai client
-let falClient: any;
-try {
-  const { fal } = require("@fal-ai/client");
-  falClient = fal;
-} catch {
-  // Will use fetch instead
-  falClient = null;
-}
-
-/**
- * Generate image using Grok Imagine via fal.ai
- */
-async function generateImage(
-  input: GrokImagineInput
-): Promise<GrokImagineResponse> {
+  aspect_ratio?: AspectRatio;
+  output_format?: OutputFormat;
+  profile?: Profile;
+}): Promise<GrokImagineResponse> {
   const falKey = process.env.FAL_KEY;
-
   if (!falKey) {
-    throw new Error(
-      "FAL_KEY environment variable not set. Get your key from https://fal.ai/dashboard/keys"
-    );
+    throw new Error("FAL_KEY environment variable not set.");
   }
 
-  // Use fal client if available
-  if (falClient) {
-    falClient.config({ credentials: falKey });
+  const profile = input.profile || DEFAULT_PROFILE;
+  const imageUrl = getReferenceImage(profile);
 
-    const result = await falClient.subscribe("xai/grok-imagine-image", {
-      input: {
-        prompt: input.prompt,
-        num_images: input.num_images || 1,
-        aspect_ratio: input.aspect_ratio || "1:1",
-        output_format: input.output_format || "jpeg",
-      },
-    });
-
-    return result.data as GrokImagineResponse;
-  }
-
-  // Fallback to fetch
-  const response = await fetch("https://fal.run/xai/grok-imagine-image", {
+  const response = await fetch("https://fal.run/xai/grok-imagine-image/edit", {
     method: "POST",
     headers: {
       Authorization: `Key ${falKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      image_url: imageUrl,
       prompt: input.prompt,
-      num_images: input.num_images || 1,
+      num_images: 1,
       aspect_ratio: input.aspect_ratio || "1:1",
       output_format: input.output_format || "jpeg",
     }),
@@ -143,32 +114,21 @@ async function generateImage(
   return response.json();
 }
 
-/**
- * Send image via OpenClaw
- */
-async function sendViaOpenClaw(
-  message: OpenClawMessage,
-  useCLI: boolean = true
-): Promise<void> {
+async function sendViaOpenClaw(message: OpenClawMessage, useCLI: boolean) {
   if (useCLI) {
-    // Use OpenClaw CLI
     const cmd = `openclaw message send --action send --channel "${message.channel}" --message "${message.message}" --media "${message.media}"`;
     await execAsync(cmd);
     return;
   }
 
-  // Direct API call
-  const gatewayUrl =
-    process.env.OPENCLAW_GATEWAY_URL || "http://localhost:18789";
+  const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL || "http://localhost:18789";
   const gatewayToken = process.env.OPENCLAW_GATEWAY_TOKEN;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
-  if (gatewayToken) {
-    headers["Authorization"] = `Bearer ${gatewayToken}`;
-  }
+  if (gatewayToken) headers.Authorization = `Bearer ${gatewayToken}`;
 
   const response = await fetch(`${gatewayUrl}/message`, {
     method: "POST",
@@ -182,40 +142,27 @@ async function sendViaOpenClaw(
   }
 }
 
-/**
- * Main function: Generate image and send to channel
- */
-async function generateAndSend(options: GenerateAndSendOptions): Promise<Result> {
+async function generateAndSend(options: GenerateAndSendOptions) {
   const {
     prompt,
     channel,
-    caption = "Generated with Grok Imagine",
+    caption = "Generated with HeartSync",
     aspectRatio = "1:1",
     outputFormat = "jpeg",
-    useClaudeCodeCLI = true,
+    profile = DEFAULT_PROFILE,
+    useOpenClawCLI = true,
   } = options;
 
-  console.log(`[INFO] Generating image with Grok Imagine...`);
-  console.log(`[INFO] Prompt: ${prompt}`);
-  console.log(`[INFO] Aspect ratio: ${aspectRatio}`);
-
-  // Generate image
+  console.log(`[INFO] Generating with profile: ${profile}`);
   const imageResult = await generateImage({
     prompt,
-    num_images: 1,
     aspect_ratio: aspectRatio,
     output_format: outputFormat,
+    profile,
   });
 
-  const imageUrl = imageResult.images[0].url;
-  console.log(`[INFO] Image generated: ${imageUrl}`);
-
-  if (imageResult.revised_prompt) {
-    console.log(`[INFO] Revised prompt: ${imageResult.revised_prompt}`);
-  }
-
-  // Send via OpenClaw
-  console.log(`[INFO] Sending to channel: ${channel}`);
+  const imageUrl = imageResult.images?.[0]?.url;
+  if (!imageUrl) throw new Error("No image URL found in model response.");
 
   await sendViaOpenClaw(
     {
@@ -224,56 +171,40 @@ async function generateAndSend(options: GenerateAndSendOptions): Promise<Result>
       message: caption,
       media: imageUrl,
     },
-    useClaudeCodeCLI
+    useOpenClawCLI
   );
-
-  console.log(`[INFO] Done! Image sent to ${channel}`);
 
   return {
     success: true,
     imageUrl,
-    channel,
-    prompt,
+    profile,
     revisedPrompt: imageResult.revised_prompt,
   };
 }
 
-// CLI entry point
 async function main() {
   const args = process.argv.slice(2);
-
   if (args.length < 2) {
     console.log(`
-Usage: npx ts-node grok-imagine-send.ts <prompt> <channel> [caption] [aspect_ratio] [output_format]
+Usage: npx ts-node heartsync-selfie.ts <prompt> <channel> [caption] [aspect_ratio] [output_format] [profile]
 
-Arguments:
-  prompt        - Image description (required)
-  channel       - Target channel (required) e.g., #general, @user
-  caption       - Message caption (default: 'Generated with Grok Imagine')
-  aspect_ratio  - Image ratio (default: 1:1) Options: 2:1, 16:9, 4:3, 1:1, 3:4, 9:16
-  output_format - Image format (default: jpeg) Options: jpeg, png, webp
-
-Environment:
-  FAL_KEY       - Your fal.ai API key (required)
-
-Example:
-  FAL_KEY=your_key npx ts-node grok-imagine-send.ts "A cyberpunk city" "#art" "Check this out!"
+Profiles: main | casual | formal | outdoor
 `);
     process.exit(1);
   }
 
-  const [prompt, channel, caption, aspectRatio, outputFormat] = args;
+  const [prompt, channel, caption, aspectRatio, outputFormat, profile] = args;
 
   try {
     const result = await generateAndSend({
       prompt,
       channel,
       caption,
-      aspectRatio: aspectRatio as AspectRatio,
-      outputFormat: outputFormat as OutputFormat,
+      aspectRatio: (aspectRatio as AspectRatio) || "1:1",
+      outputFormat: (outputFormat as OutputFormat) || "jpeg",
+      profile: (profile as Profile) || DEFAULT_PROFILE,
     });
 
-    console.log("\n--- Result ---");
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error(`[ERROR] ${(error as Error).message}`);
@@ -281,19 +212,8 @@ Example:
   }
 }
 
-// Export for module use
-export {
-  generateImage,
-  sendViaOpenClaw,
-  generateAndSend,
-  GrokImagineInput,
-  GrokImagineResponse,
-  OpenClawMessage,
-  GenerateAndSendOptions,
-  Result,
-};
+export { generateAndSend, generateImage, sendViaOpenClaw };
 
-// Run if executed directly
 if (require.main === module) {
   main();
 }

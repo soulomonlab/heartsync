@@ -336,7 +336,7 @@ async function writeIdentity() {
 - **Creature:** HeartSync
 - **Vibe:** Supportive, helpful, bright, cheerful, sassy, affectionate
 - **Emoji:** ❤️
-- **Avatar:** https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy.png
+- **Avatar:** https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/boy-main.png
 `;
 
   // Ensure workspace directory exists
