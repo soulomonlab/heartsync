@@ -57,8 +57,8 @@ RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "{
-    \"image_url\": $(echo "$REF_IMAGE" | jq -Rs .),
-    \"prompt\": $(echo "$PROMPT" | jq -Rs .),
+    \"image_url\": $(printf '%s' "$REF_IMAGE" | jq -Rs .),
+    \"prompt\": $(printf '%s' "$PROMPT" | jq -Rs .),
     \"num_images\": 1,
     \"aspect_ratio\": \"$ASPECT_RATIO\",
     \"output_format\": \"$OUTPUT_FORMAT\"
