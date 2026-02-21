@@ -61,13 +61,34 @@ RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image/edit" \
     \"output_format\": \"$OUTPUT_FORMAT\"
   }")
 
-if echo "$RESPONSE" | jq -e '.error' >/dev/null 2>&1; then
+if echo "$RESPONSE" | jq -e '.error // .detail' >/dev/null 2>&1; then
   log_error "$(echo "$RESPONSE" | jq -r '.error // .detail // "Unknown error"')"
   exit 1
 fi
 
-IMAGE_URL=$(echo "$RESPONSE" | jq -r '.images[0].url // empty')
-[ -z "$IMAGE_URL" ] && { log_error "No image URL in response"; exit 1; }
+# fal can return different response shapes depending on model/runtime
+IMAGE_URL=$(echo "$RESPONSE" | jq -r '.images[0].url // .data.images[0].url // .output[0].url // empty')
+
+# async fallback: poll request status when only request_id is returned
+if [ -z "$IMAGE_URL" ]; then
+  REQUEST_ID=$(echo "$RESPONSE" | jq -r '.request_id // empty')
+  if [ -n "$REQUEST_ID" ]; then
+    log_info "Request queued ($REQUEST_ID). Polling..."
+    for i in {1..20}; do
+      STATUS=$(curl -s "https://fal.run/xai/grok-imagine-image/edit/requests/$REQUEST_ID/status" \
+        -H "Authorization: Key $FAL_KEY")
+      IMAGE_URL=$(echo "$STATUS" | jq -r '.images[0].url // .response.images[0].url // .data.images[0].url // empty')
+      [ -n "$IMAGE_URL" ] && break
+      sleep 1
+    done
+  fi
+fi
+
+if [ -z "$IMAGE_URL" ]; then
+  log_error "No image URL in response"
+  echo "Raw response: $RESPONSE"
+  exit 1
+fi
 
 openclaw message send \
   --action send \
