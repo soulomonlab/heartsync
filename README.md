@@ -105,6 +105,25 @@ This ensures consistent appearance across all generated images.
 - **Messaging**: OpenClaw Gateway API
 - **Supported Platforms**: Discord, Telegram, WhatsApp, Slack, Signal, MS Teams
 
+## V2 Relationship Pack
+
+This fork adds a boyfriend-focused relationship layer:
+
+- **Persona modes**
+  - `soft`: comforting and emotionally validating
+  - `chill`: casual, low-pressure, playful daily vibe
+  - `flirty`: light romantic energy (respectful, consent-first)
+- **Preset selfie intents**
+  - `good-morning selfie`
+  - `good-night selfie`
+  - `date-night look`
+  - `work-mode check-in`
+
+Use these as keywords in user prompts, e.g.:
+- "send a good morning selfie"
+- "show me your date-night look"
+- "send a chill work-mode pic"
+
 ## Project Structure
 
 ```
