@@ -1,6 +1,6 @@
 {
   "name": "heartsync",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Add selfie superpowers to your OpenClaw agent using xAI Grok Imagine",
   "bin": {
     "heartsync": "./bin/cli.js"
@@ -29,9 +29,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcj9587/heartsync"
+    "url": "https://github.com/soulomonlab/heartsync"
   },
-  "homepage": "https://github.com/mcj9587/heartsync#readme",
+  "homepage": "https://github.com/soulomonlab/heartsync#readme",
   "engines": {
     "node": ">=18.0.0"
   },
