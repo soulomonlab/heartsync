@@ -61,18 +61,24 @@ interface GenerateAndSendOptions {
 
 const DEFAULT_PROFILE: Profile = "main";
 
+function sanitizeUrl(input?: string): string | undefined {
+  if (!input) return undefined;
+  const v = input.trim();
+  return v.length ? v : undefined;
+}
+
 function getReferenceImage(profile: Profile): string {
   const byProfile: Record<Profile, string | undefined> = {
-    main: process.env.HEARTSYNC_REF_MAIN,
-    casual: process.env.HEARTSYNC_REF_CASUAL,
-    formal: process.env.HEARTSYNC_REF_FORMAL,
-    outdoor: process.env.HEARTSYNC_REF_OUTDOOR,
+    main: sanitizeUrl(process.env.HEARTSYNC_REF_MAIN),
+    casual: sanitizeUrl(process.env.HEARTSYNC_REF_CASUAL),
+    formal: sanitizeUrl(process.env.HEARTSYNC_REF_FORMAL),
+    outdoor: sanitizeUrl(process.env.HEARTSYNC_REF_OUTDOOR),
   };
 
   return (
     byProfile[profile] ||
-    process.env.HEARTSYNC_REF_MAIN ||
-    process.env.HEARTSYNC_REF_IMAGE ||
+    sanitizeUrl(process.env.HEARTSYNC_REF_MAIN) ||
+    sanitizeUrl(process.env.HEARTSYNC_REF_IMAGE) ||
     "https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/main.png"
   );
 }

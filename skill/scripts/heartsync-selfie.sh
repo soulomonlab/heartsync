@@ -48,6 +48,9 @@ case "$PROFILE" in
   *) REF_IMAGE="$REF_MAIN" ;;
 esac
 
+# trim accidental spaces/newlines in env-provided URLs
+REF_IMAGE="$(echo -n "$REF_IMAGE" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+
 log_info "Generating image (profile=$PROFILE)..."
 
 RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image/edit" \
