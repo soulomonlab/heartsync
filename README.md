@@ -2,6 +2,12 @@
 
 Turn your OpenClaw agent into a **boyfriend persona** that can send selfies on command.
 
+## Demo
+
+Upload your demo file to `assets/demo.mp4` and link it here:
+
+- [Watch demo video](./assets/demo.mp4)
+
 Inspired by the Clawra workflow, this package installs a plug-and-play OpenClaw skill with:
 - relationship-style persona injection
 - selfie generation flow (fal.ai)
