@@ -30,6 +30,16 @@ The installer will:
 4. Update `~/.openclaw/openclaw.json`
 5. Inject boyfriend selfie capability into your workspace `SOUL.md`
 
+### Fast Local Test (recommended)
+
+```bash
+cp .env.example .env
+# add your FAL_KEY in .env
+./scripts/heartsync-selfie.sh "warm casual cafe selfie" "telegram:8415830962" "test" "1:1" "jpeg" "casual"
+```
+
+> Telegram tip: use numeric `chat_id` (`telegram:8415830962`) instead of `telegram:@username`.
+
 ---
 
 ## What This Skill Does
@@ -74,6 +84,13 @@ The installer will:
 - [OpenClaw](https://github.com/openclaw/openclaw) installed
 - [fal.ai](https://fal.ai) account
 - `FAL_KEY` from https://fal.ai/dashboard/keys
+
+## Security Basics
+
+- Never commit `.env`, API tokens, or gateway secrets.
+- Rotate `FAL_KEY` immediately if exposed.
+- Use a dedicated bot/account for testing.
+- Prefer private test chats while validating prompts/images.
 
 ---
 
@@ -164,8 +181,14 @@ heartsync/
 │   ├── heartsync-selfie.sh
 │   └── heartsync-selfie.ts
 ├── assets/
-│   └── boy.png
+│   ├── main.png
+│   ├── casual.png
+│   ├── formal.png
+│   └── outdoor.png
+├── .env.example
 ├── SKILL.md
+├── SECURITY.md
+├── CONTRIBUTING.md
 ├── package.json
 └── README.md
 ```

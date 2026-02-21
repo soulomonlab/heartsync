@@ -13,8 +13,17 @@ log_info(){ echo -e "${GREEN}[INFO]${NC} $1"; }
 log_error(){ echo -e "${RED}[ERROR]${NC} $1"; }
 log_warn(){ echo -e "${YELLOW}[WARN]${NC} $1"; }
 
+# Optional: load local .env for convenience
+if [ -f .env ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env
+  set +a
+fi
+
 if [ -z "${FAL_KEY:-}" ]; then
   log_error "FAL_KEY environment variable not set"
+  echo "Tip: set FAL_KEY in your shell or .env file"
   exit 1
 fi
 
@@ -33,7 +42,13 @@ PROFILE="${6:-main}"
 if [ -z "$PROMPT" ] || [ -z "$CHANNEL" ]; then
   echo "Usage: $0 <prompt> <channel> [caption] [aspect_ratio] [output_format] [profile]"
   echo "Profiles: main | casual | formal | outdoor"
+  echo "Example target: telegram:8415830962"
   exit 1
+fi
+
+if [[ "$CHANNEL" == telegram:@* ]]; then
+  log_warn "Telegram @username targets are unreliable for bots."
+  log_warn "Use numeric chat id instead, e.g. telegram:8415830962"
 fi
 
 REF_MAIN="${HEARTSYNC_REF_MAIN:-${HEARTSYNC_REF_IMAGE:-https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/main.png}}"

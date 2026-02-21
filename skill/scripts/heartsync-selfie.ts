@@ -201,6 +201,10 @@ Profiles: main | casual | formal | outdoor
 
   const [prompt, channel, caption, aspectRatio, outputFormat, profile] = args;
 
+  if (channel.startsWith("telegram:@")) {
+    console.warn("[WARN] Telegram @username target may fail. Prefer numeric chat id, e.g. telegram:8415830962");
+  }
+
   try {
     const result = await generateAndSend({
       prompt,
