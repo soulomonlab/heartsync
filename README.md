@@ -131,7 +131,7 @@ Your agent can respond to:
 Default reference image URL:
 
 ```text
-https://cdn.jsdelivr.net/gh/mcj9587/heartsync-selfie@main/assets/heartsync.png
+https://cdn.jsdelivr.net/gh/soulomonlab/heartsync@main/assets/heartsync.png
 ```
 
 You can replace this with your own image in scripts/config for custom visual identity.
